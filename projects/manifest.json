@@ -1,0 +1,24 @@
+{
+    "dir": "ltr",
+    "lang": "en",
+    "name": "Production | Malpack",
+    "scope": "/fuller-app/",
+    "display": "browser",
+    "start_url": "https://istuffer-malpack.github.io/fuller-app/",
+    "short_name": "Production | Ma",
+    "theme_color": "transparent",
+    "description": "Malpack Production Interface",
+    "orientation": "any",
+    "background_color": "transparent",
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "/images/fuller-app/images/fuller-app/img/favicon.png",
+            "type": "image/png",
+            "sizes": "32x32"
+        }
+    ],
+    "url": "https://istuffer-malpack.github.io/fuller-app/",
+    "screenshots": []
+}
