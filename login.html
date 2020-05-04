@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">	
+    <title>Log in</title>
+	<meta name="description" content="Malpack Production Interface">
+	<meta name="author" content="Istuffer Sanchez">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noimageindex, noindex, nofollow, nosnippet">
+	<link rel="manifest" href="./manifest.json">
+	<link rel="stylesheet" href="./css/normalize.css">
+	<link rel="stylesheet" href="./css/skeleton.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/circle.css">  
+	<link rel="icon" type="image/png" href="./img/favicon.png">
+	<script src="./js/app.js"></script>	
+	<style>
+	.signinsection{	
+		position:relative;top: 15%;	
+	}
+	.form-signin input[type="text"], .form-signin input[type="password"] {
+		border: 1px rgb(169, 169, 169) solid!important;
+		width: 100%;
+		margin-bottom: 15px;
+		border-radius: 0;
+	}
+	.showPswrd{
+			position: relative;
+			float: right;
+			top: -46px;
+			font-size: 12px;
+			left: -20px;
+			color: teal;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body class="dark-theme">
+	<div class="container w-20 signinsection">
+		<form class="form-signin white-bg shadow-lg rounded-lg border section" name="login" id="Login" style="color:#000;padding: 50px;">
+			<div class="row center-aligned margin-bottom-25">
+				<img class="margin-bottom-20" src="./img/malpack-small.png" alt="Malpack Logo" width="72" height="72" style="border-radius: 15px;">
+			</div>
+			<div class="row margin-bottom-25">
+				<!-- <select name="shift" id="shift" class="white-bg w-100">
+					<option value="">Select Shift</option>
+					<option value="Shift A">Shift A</option>
+					<option value="Shift B">Shift B</option>
+					<option value="Shift C">Shift C</option>
+					<option value="Shift D">Shift D</option>
+				</select> -->
+				<input type="text" name="userid" id="inputUser" placeholder="Username" required="required" autofocus="autofocus" autocomplete="off">
+				<input name="pswrd" type="password" id="inputPassword" placeholder="Password" required="required">
+				<span id="showPswrd" class="showPswrd">show</span>
+							
+				<button class="button button-primary w-100 login" type="submit">Sign In</button>
+			</div>
+			<div class="error-alert lt-red-bg padding-15 row" style="display:none;">
+			  Username and password do not match. Please try again.
+			</div>			  
+		</form>			
+	</div>
+
+	<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+	<script src="./js/angular.min.js"></script>	
+	<script src="./js/JsBarcode.all.min.js"></script>
+	<script type="text/javascript" src="./js/custdb.js"></script>
+	<script type="text/javascript" src="./js/fullerApp.js"></script>
+	
+	<script>
+
+	'use strict'
+	var passwordInput = document.getElementById("inputPassword");	
+	var toggle = document.getElementById('showPswrd');
+
+		function togglePassword() {  
+		  if (passwordInput.type === 'password') {
+			passwordInput.type = 'text';
+			if(passwordInput.value != ''){
+				toggle.innerHTML = 'hide';
+			}
+		  } else {
+			passwordInput.type = 'password';
+			
+			toggle.innerHTML = 'show';
+		  }
+		}
+		(function () {
+		  toggle.addEventListener('click', togglePassword, false);
+		})();
+		
+		
+  
+</script>
+<script>
+//const ipc = require('electron').ipcRenderer;
+
+$( ".login" ).click(function( event ) {			 
+			  event.preventDefault();
+			  var userN = $('#inputUser').val();
+			  //check input fieldset
+			  $('#inputUser').val(userN.toLowerCase());
+			  
+			  var userName = $('#inputUser').val();
+			  
+			  var psw = $('#inputPassword').val();
+			  var shift = $('#shift').val();
+			 
+			  if(userName != '' && psw != ''){		  
+			  
+			  $(this).attr('disabled','disabled');
+			  $(this).html('<img src="./img/sending.gif"/>');
+			  
+			  $.ajax({
+					url: 'https://script.google.com/macros/s/AKfycby3tT-3998X43JJH8l7nV4eI5bhBbb-aju1OQUM4PQ_lV3WUFke/exec', //?userid='+userName.toLowerCase()+'&password='+psw,
+					type: 'get',
+					dataType: 'json',
+					data: $('#Login').serialize(),
+					success: function(data){
+						var d = data;						
+						var user;
+											
+						if(d.result === "success"){
+								
+							if (typeof(Storage) !== "undefined") {							  
+									
+								if(shift !==''){
+									user = userName+"/"+shift;
+								}else{
+									user = d.userProfile;
+								}
+								
+							} else {							
+								user = userName+"/"+shift;						  
+							}
+								localStorage.setItem("shift", user);	
+								//ipc.sendSync('entry-accepted', 'ping');
+          						window.open('index.html','_self');
+								
+						}else{
+							//load error message-box							
+							$(".login").html('Sign in');
+							$('.error-alert').text("Username and password do not match. Please try again.").slideDown();
+							setTimeout(function() {
+								$(".error-alert").slideUp();	
+								$(".login").removeAttr('disabled','disabled');								
+							}, 3000);							
+						}						
+					}
+				});
+			 
+			  }else{
+			  
+				$('.error-alert').text('Username or password is empty. Please enter correct username & password.').slideDown();
+				
+				setTimeout(function() {
+					$(".error-alert").slideUp();
+				}, 3000);				
+				
+			  }			  
+			  
+			});
+</script>
+</body>
+
+</html>
