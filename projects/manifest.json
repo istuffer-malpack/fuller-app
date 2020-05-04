@@ -3,7 +3,7 @@
     "lang": "en",
     "name": "Production | Malpack",
     "scope": "/fuller-app/",
-    "display": "browser",
+    "display": "standalone",
     "start_url": "https://istuffer-malpack.github.io/fuller-app/",
     "short_name": "Production | Ma",
     "theme_color": "transparent",
@@ -14,7 +14,7 @@
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "/images/fuller-app/images/fuller-app/img/favicon.png",
+            "src": "/fuller-app/images/fuller-app/img/favicon.png",
             "type": "image/png",
             "sizes": "32x32"
         }
