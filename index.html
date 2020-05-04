@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Production | Malpack</title>
+	<meta name="description" content="Malpack Production Interface">
+	<meta name="author" content="Istuffer Sanchez">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noimageindex, noindex, nofollow, nosnippet">
+	<link rel="stylesheet" href="./css/normalize.css">
+	<link rel="stylesheet" href="./css/skeleton.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/circle.css">
+  
+	<link rel="icon" type="image/png" href="./img/favicon.png">
+</head>
+<body class="dark-theme" ng-app="app" ng-controller="overviewController as view" ng-cloak> 
+  <div class="section header u-max-full-width">
+    <div class="row">
+      <div class="three columns">
+        <img src="./img/malpack-logo.png" alt="Malpack">        
+      </div>
+	  <div class="five columns center-aligned">
+        <select id="machineLine" class="no-border" ng-model="linen" ng-change="showChart(linen)">
+			<option ng-repeat="line in machineLine" value="{{line}}">{{line}}</option>
+		</select>        
+      </div>
+	  <div class="four columns dd center-aligned">	  
+			<div class="dropdown print-label-dd">
+				<button class="white-text">Print Label</button>
+				<div class="dropdown-content black-text">
+					<p class="dropdown-item button button-white gray-text productreturn no-border w-100" onclick='showModal("printLabelBarcode")'>Bar Codes</p>
+					<p class="dropdown-item button button-white gray-text productreturn no-border w-100" onclick='showModal("printLabelTags")'>Skid Tags</p>
+				</div>
+			</div>			
+			<div class="dropdown user-dd" style="display:none;">
+			  <img class="icon" src="./img/user.png" alt="User"><span class="text-normal white-text">{{user.split("/")[1]}}</span>
+			  <div class="dropdown-content">
+				<p class="dropdown-item button button-info productreturn no-border w-100">Sign Out</p>
+			  </div>
+			</div>
+      </div>
+    </div>
+  </div>  
+  <div class="container main u-max-full-width">	
+	<div class="top-content row" style="display:none;">
+		<div class="three columns box">
+			<div class="row">
+				<div class="five columns"><h5>STATUS: </h5></div>
+				<div class="seven columns">
+					<span class="neon-green-text center-aligned" ng-repeat="lineInfo in lineData | filter: linen" ng-if="(lineInfo.CURRENT_SPEED).length">RUNNING</span>
+					<span class="neon-red-text center-aligned" ng-repeat="lineInfo in lineData | filter: linen" ng-if="!(lineInfo.CURRENT_SPEED).length">DOWN</span>
+				</div>
+			</div>				
+				<div class="row">
+					<h6 class="two columns no-margin">Speed: </h6>
+					<span class="indigo-text four columns" ng-repeat="lineInfo in lineData | filter: linen">{{lineInfo.CURRENT_SPEED.split('/')[0]}} m/min</span>
+					<h6 class="two columns">Output: </h6>
+					<span class="indigo-text four columns" ng-repeat="lineInfo in lineData | filter: linen">{{lineInfo.CURRENT_SPEED.split('/')[1]}} kg/hr</span>
+				</div>
+				<div class="row">
+					<h6 class="three columns">Vacuum Settings:</h6>
+					<span class="indigo-text three columns padding-top-10" ng-repeat="lineInfo in lineData | filter: linen">VB1: {{lineInfo.VACUUM_SETTINGS.split('/')[0]}}</span>
+					<span class="indigo-text three columns padding-top-10" ng-repeat="lineInfo in lineData | filter: linen">VB3: {{lineInfo.VACUUM_SETTINGS.split('/')[2]}}</span>
+					<span class="indigo-text three columns padding-top-10" ng-repeat="lineInfo in lineData | filter: linen">VB2: {{lineInfo.VACUUM_SETTINGS.split('/')[1]}}</span>
+				</div>		
+		</div>
+		<div class="three columns box">
+			<h5>DAILY PRODUCTION</h5>
+			<div class="row">
+				<div class="eight columns">
+					<div class="row">			
+						<h6 class="six columns no-margin">Scheduled: </h6>
+						<span class="indigo-text six columns" ng-repeat="lineInfo in lineData | filter: linen">{{lineInfo.SCHEDULED_TOTAL_LBS | number:0}} lbs.</span>				
+					</div>
+					<div class="row">
+						<h6 class="six columns no-margin">@ Current Run: </h6>
+						<span class="indigo-text six columns" ng-repeat="lineInfo in lineData | filter: linen">{{lineInfo.PRODUCTION_AT_CURRENT_SPEED | number:0}} lbs.</span>				
+					</div>
+				</div>
+				<div class="four columns" ng-repeat="lineInfo in lineData | filter: linen">
+					<div class="c100 p{{(lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100 | number:0}}">
+					  <span class="{{((lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100) >= 60 ? 'info':'orange'}}-text">{{((lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100 | number:0) == 0 ? 0 : (lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100 | number:0}}%</span>
+					  <div class="slice">
+						<div class="bar {{((lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100) >= 60 ? 'green':'red'}}-color"></div>
+						<div class="fill {{((lineInfo.PRODUCED/lineInfo.PRODUCTION_ORDERS)*100) >= 60 ? 'green':'red'}}-color"></div>
+					  </div>
+					</div>
+				</div>
+			</div>					
+		</div>
+		<div class="three columns box">
+			<h5>QC TREND <span class="u-pull-right orange-text xsmall cursor-pointer no-margin no-padding hover-gray" onclick="openNav('qc_trend')">view details</span></h5>
+			<!-- <h6 class="red-text sparkline-no-data" ng-show="!(qcDataSource.length)">No Data available...</h6> -->
+			<div class="row sparkline">					
+				<div id="chart_div2" class="chart" style="height:120px;position:relative;top:-35px"></div>
+			</div>
+			
+		</div>
+		<div class="three columns box">
+			<h5>QUALITY ISSUES <span class="u-pull-right orange-text xsmall cursor-pointer no-margin no-padding hover-gray" onclick="openNav('qc_defects')">view details</span></h5>
+			<p class="info-text" ng-repeat="lineInfo in lineData | filter: linen" ng-if="(lineInfo.QC_ISSUE).length">{{lineInfo.QC_ISSUE}}</p>
+			<h6 class="green-text" ng-repeat="lineInfo in lineData | filter: linen" ng-show="!(lineInfo.QC_ISSUE).length">No Quality Issues on current run...</h6>
+		</div>
+	</div>
+	<div class="bottom-content">
+	<div class="row">
+		<h4 class="green-text">LINE SCHEDULE</h4>
+				<!-- no show -->
+					<div ng-show="loading" class="center-aligned" style="height: 300px;margin: 7% auto;">
+						<img src="./img/ajax-loader.gif" alt="Loading..."/>						
+					</div>
+				<!-- no show -->
+			<table class="table table-hover fixed-headers" ng-show="!loading">
+				<thead class="indigo-bg white-text">
+							<tr class="text-center">							
+								<th>Product</th>
+								<th>Customer</th>
+								<th>Order Number</th>
+								<th>No of Skids</th>
+								<th>Start - End</th>
+								<th>Print</th>
+							</tr>
+						</thead>
+				<tbody class="text-center" ng-if="(schedule | filter : linen).length">					
+					<tr ng-repeat="x in schedule | filter : linen" class="{{x.FLAG}}">
+						<td ng-click="populateJO(x)" class="jo-link text-dark order-number" data-toggle='modal' data-target='#jobOrderForm'>{{x.PRODUCT_ID}}</td>
+						<td ng-click="populateJO(x)" class="jo-link text-dark order-number" data-toggle='modal' data-target='#jobOrderForm'>{{x.CUSTOMERID}}</td>
+						<td ng-click="populateJO(x)" class="jo-link text-dark order-number" data-toggle='modal' data-target='#jobOrderForm'>{{x.ORDER_NUMBER}}</td>
+						<td ng-click="populateJO(x)" class="jo-link text-dark order-number" data-toggle='modal' data-target='#jobOrderForm'>{{x.SKID_QTY}}</td>
+						<td ng-click="populateJO(x)" class="jo-link text-dark order-number" data-toggle='modal' data-target='#jobOrderForm'>{{x.START | date: 'MMM dd hh:mm a'}} - {{x.END | date: 'MMM dd hh:mm a'}}</td>
+						<td>
+							<button class="button button-info text-white barcode-tag label-tag" ng-click="printBC(x.SKID_IDS,x.PRODUCT_ID,x.SKID_QTY,false)">Barcode</button>
+							<button class="button button-gray skid-tag" ng-show="x.ITEM_CLASSIFICATION == 'Standard Items'" ng-click="printLabel(x.CUSTOMERNAME,x.PRODUCT_DESCRIPTION,x.SKID_QTY,x.OPEN_QTY,x.UOM,x.ORDER_PO_NUMBER,x.PRODUCT_ID)">Skid Tag</button>
+						</td>
+					</tr>						
+				</tbody>
+			</table>				
+				
+				<h5 class="orange-text" ng-if="!(schedule | filter : linen).length && !loading">No data available...</h5>
+				<p class="small twelve columns right-aligned padding-right-15" ng-if="(schedule | filter : linen).length"> 
+					*** Note: Data are based from an external program and not guarantee the actual time running on each machine.
+				</p>
+	</div>	
+  </div>
+  
+  
+
+<!-- The Modal -->
+<div id="jobOrderModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close orange-text" onclick="closeModal('jobOrderModal')">&times;</span>
+    
+	<div class="job-order-form">
+	
+	<div class="row border padding-15">
+		<div class="two columns center-aligned">
+			<img src="./img/malpack-logo-black.png" alt="Malpack">
+		</div>
+		<div class="eight columns center-aligned">
+			<h4 class="no-margin" style="font-weight: 600;">LINE INSTRUCTIONS</h4>
+		</div>
+		<div class="two columns">			
+			<!-- <button class="button button-outline info-text">Print</button> -->
+		</div>
+	</div>
+	<div class="row border no-top-border">
+		<div class="six columns padding-15">
+			<label class="two columns">Line:</label>
+			<span class="ten columns">{{currentOrder.SCHEDULED_LINE}}</span>
+		</div>
+		<div class="six columns border-left padding-15">
+			<label class="two columns">Sold To:</label>
+			<span class="ten columns">{{currentOrder.CUSTOMERNAME}}</span>
+		</div>
+	</div>
+	<div class="row border no-top-border">
+		<div class="four columns padding-15">
+			<label class="six columns">Order Number:</label>
+			<span class="six columns">{{currentOrder.ORDER_NUMBER}}</span>
+		</div>
+		<div class="four columns border-left padding-15">
+			<label class="six columns">P.O. Number:</label>
+			<span class="six columns">{{currentOrder.ORDER_PO_NUMBER}}</span>
+		</div>
+		<div class="four columns border-left" style="min-height: 55px;">
+			<div class="row padding-left-15">
+				<label class="six columns">Order Date:</label>
+				<span class="six columns">{{currentOrder.ORDER_DATE | date : 'MMM dd yyyy'}}</span>
+			</div>
+			<div class="row padding-left-15">
+				<label class="six columns">Delivery Date:</label>
+				<span class="six columns">{{currentOrder.EXPECTED_DATE | date : 'MMM dd yyyy'}}</span>
+			</div>				
+		</div>
+	</div>
+	<div class="row border no-top-border">
+		<div class="four columns padding-15">
+			<label class="">Film Type:</label>
+			<span class="">{{filmType(currentOrder.PRODUCT_DESCRIPTION)}}</span>
+		</div>
+		<div class="two columns border-left padding-15" style="min-height: 80px;">
+			<label class="">Roll Config:</label>
+			<span class="">{{currentOrder.ROLL_CONFIG}}</span>
+		</div>
+		<div class="two columns border-left padding-15">			
+			<label class="">Width:</label>
+			<span class="">{{currentOrder.PRODUCT_ID.slice(5,8)}} mm</span>
+		</div>
+		<div class="two columns border-left padding-15">
+			<label class="">Gauge:</label>
+			<span class="">{{currentOrder.PRODUCT_ID.slice(9,12)}}</span>
+		</div>
+		<div class="two columns border-left padding-15">
+			<label class="">Length:</label>
+			<span class="">{{currentOrder.PRODUCT_ID.slice(13,17)}}</span>
+		</div>	
+	</div>
+	<div class="row border no-top-border">
+		<div class="row padding-15">
+			<label class="two columns">Product Desc:</label>
+			<div class="ten columns">
+				<span class="stacked"><i><b>{{currentOrder.ITEMNUMBER}}</i></b></span>
+				<span class="stacked">{{currentOrder.PRODUCT_DESCRIPTION}}</span>
+			</div>
+		</div>
+		<div class="row padding-left-15 padding-bottom-15">
+			<label class="two columns">Product Code:</label>
+			<div class="ten columns">
+				<span>{{currentOrder.PRODUCT_ID}}</span>
+			</div>
+		</div>
+	</div>
+	<div class="row border no-top-border">
+		<div class="three columns padding-15">
+			<div class="row">
+				<label class="nine columns">{{currentOrder.UOM}}/Skid:</label>
+				<span class="three columns center-aligned">{{currentOrder.OPEN_QTY / currentOrder.SKID_QTY}}</span>
+			</div>
+			<div class="row">
+				<label class="nine columns">Total Skid:</label>
+				<span class="three columns center-aligned">{{currentOrder.SKID_QTY}}</span>
+			</div>	
+		</div>
+		<div class="three columns border-left padding-15">
+			<div class="row">
+				<label class="six columns">Pallet Size:</label>
+				<span class="six columns">{{currentOrder.PALLET_SIZE}}</span>
+			</div>
+			<div class="row">
+				<label class="six columns">Core Size:</label>
+				<span class="six columns">{{currentOrder.CORE_SIZE}}</span>
+			</div>	
+		</div>
+		<div class="three columns border-left padding-15">
+			<label class="">Box code:</label>
+			<input type="text" class="u-full-width no-border no-margin no-padding" value="{{currentOrder.BOXCODE}}" />
+		</div>
+		<div class="three columns border-left padding-15">			
+				<label class="">Roll Weight:</label>
+				<span class="s">{{currentOrder.ROLL_WT}} lbs</span>						
+		</div>
+	</div>
+	
+	<div class="row border no-top-border">
+		<div class="six columns padding-15" style="border-right: 1px #000 solid;width: 51%;min-height: 200px;">
+			<label class="">Customer Requirements</label>
+			<p class="p">{{currentOrder.SPECIAL_COMMENT}}</p>
+		</div>
+		<div class="six columns padding-15 no-margin">
+			<label class="">Quality Alerts</label>
+			<textarea class="form-control-plaintext pl-3" >{{currentOrder.QUALITY_ALLERT}}</textarea>
+		</div>
+	</div>
+	<div class="row border no-top-border">
+		<div class="six columns padding-15" style="border-right: 1px #000 solid;width: 51%;">
+			<label class="">Comments</label>
+			<textarea class="form-control-plaintext pl-3" >{{currentOrder.NOTE}}</textarea>
+		</div>
+		<div class="six columns padding-15 no-margin">
+			<label class="">Supervisor/Operator Name:</label>
+			<input type="text" class="u-full-width no-border no-margin no-padding" value="{{user}}" />
+		</div>
+	</div>
+	
+	
+<h6 class="u-pull-right"><b>WI - 000</b></h6>
+</div>	
+  </div>
+</div><!--JOBORDER-->
+
+<!-- skidtag modal -->
+<div id="skidTagPrint" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content w-30">
+    <div class="modal-header white-bg border-bottom">
+      <span class="close gray-text" onclick="closeModal('skidTagPrint')">&times;</span>
+      <h4 class="info-text">Print Skid Tag</h4>
+    </div>
+   
+    <div class="modal-body section align-center" id="skidtag" style="text-align:center;">		
+		<div class="form-inline section">					
+			<div class="form-group bc-form">
+				<!-- <span class="row ">Barcode:</span> -->
+				<input type="text" class="skidIdFrom border w-40" placeholder="Barcode from" value="" ng-model="skididfrom"/>
+				<input type="text" class="skidIdTo border w-40" placeholder="Barcode to" value="" ng-model="skididto"/>
+				<button type="button" class="button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skididfrom,skididto,productId)">Print</button>
+			</div>
+		</div>
+    </div>        
+  </div>
+</div>
+
+<div id="printLabelBarcode" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content w-30">
+    <div class="modal-header white-bg border-bottom">
+      <span class="close green-text" onclick="closeModal('printLabelBarcode')">&times;</span>
+      <h4 class="info-text">Print Barcode</h4>
+    </div>
+   
+    <div class="modal-body section align-center" id="skidtag">		
+		<div class="form-inline section">					
+			<div class="form-group bc-form">
+				<div class="left-aligned row">
+					<p class="three columns orange-text">Product Code:</p>
+					<input type="text" class="nine columns border w-100 prodid reset" placeholder="ie: VX-H-330-LGT-600M-Q126" value="" ng-model="prodC"/>
+				</div>
+				<div class="row">
+					<input type="text" class="five columns skidIdFrom border w-100 reset" placeholder="Barcode from" value="" ng-model="skidfrom"/>
+					<input type="text" class="five columns skidIdTo border w-100 reset" placeholder="Barcode to" value="" ng-model="skidto"/>
+					<button type="button" class="two columns button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skidfrom,skidto,prodC)">Print</button>
+				</div>				
+			</div>
+		</div>
+    </div>        
+  </div>
+</div>
+
+<div id="printLabelTags" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content w-30">
+    <div class="modal-header white-bg border-bottom">
+      <span class="close green-text" onclick="closeModal('printLabelTags')">&times;</span>
+      <h4 class="info-text">Print SkidTags</h4>
+    </div>
+   
+    <div class="modal-body section align-center" id="skidtag">		
+		<div class="form-inline section">					
+			<div class="form-group bc-form">
+				<div class="left-aligned row">
+					<p class="three columns orange-text">Product Code:</p>
+					<datalist id="productList">
+						<option value="MW-B-003-075-1500-Q040">
+						<option value="MW-B-005-075-1000-Q040">
+						<option value="MW-B-005-075-1500-Q040">
+						<option value="MW-X-500-070-1000-Q040">
+						<option value="PL-B-003-047-1000-Q040">
+						<option value="PL-B-003-047-1000-Q072">
+						<option value="PL-B-003-047-2000-Q040">
+						<option value="PL-B-003-047-300M-Q072">
+						<option value="PL-B-003-055-300M-Q072">
+						<option value="PL-B-003-070-210M-Q072">
+						<option value="PL-B-005-047-1000-Q040">
+						<option value="PL-B-005-047-300M-Q072">
+						<option value="PL-B-005-070-210M-Q072">
+						<option value="PL-X-005-047-300M-Q072">
+						<option value="PL-X-500-047-1000-Q040">
+						<option value="PL-X-500-047-1000-Q060">
+						<option value="PL-X-500-047-300M-Q072">
+						<option value="PL-X-500-047-305M-Q060">
+						<option value="ST-B-003-080-1000-Q060">
+						<option value="ST-B-003-090-1000-Q060">
+						<option value="ST-B-003-120-0700-Q060">
+						<option value="ST-B-005-080-1000-Q060">
+						<option value="ST-B-005-080-2500-Q320">
+						<option value="ST-B-005-090-1000-Q060">
+						<option value="ST-B-005-100-2500-Q180">
+						<option value="ST-B-005-120-0700-Q060">
+						<option value="ST-X-003-080-1000-Q060">
+						<option value="ST-X-005-080-1000-Q060">
+						<option value="ST-X-500-080-1000-Q060">
+						<option value="ST-X-750-200-0450-Q025">
+						<option value="VX-H-305-LGT-450M-BX60">
+						<option value="VX-H-305-LGT-450M-Q280">
+						<option value="VX-H-305-LGT-600M-Q210">
+						<option value="VX-H-305-MED-450M-BX60">
+						<option value="VX-H-305-MED-450M-Q168">
+						<option value="VX-H-305-MED-450M-Q280">
+						<option value="VX-H-305-ULT-600M-Q210">
+						<option value="VX-H-330-LGT-450M-Q168">
+						<option value="VX-H-330-LGT-600M-Q126">
+						<option value="VX-H-355-ULT-600M-Q126">
+						<option value="VX-H-381-HVY-450M-BX36">
+						<option value="VX-H-381-HVY-450M-Q168">
+						<option value="VX-H-381-LGT-450M-BX36">
+						<option value="VX-H-381-LGT-450M-P036">
+						<option value="VX-H-381-LGT-450M-P036">
+						<option value="VX-H-381-LGT-450M-Q168">
+						<option value="VX-H-381-LGT-450M-Q280">
+						<option value="VX-H-381-LGT-600M-P036">
+						<option value="VX-H-381-LGT-600M-Q126">
+						<option value="VX-H-381-LGT-600M-Q168">
+						<option value="VX-H-381-LGT-760M-Q090">
+						<option value="VX-H-381-MED-450M-BX36">
+						<option value="VX-H-381-MED-450M-BX48">
+						<option value="VX-H-381-MED-450M-P036">
+						<option value="VX-H-381-MED-450M-Q168">
+						<option value="VX-H-381-ULT-450M-BX36">
+						<option value="VX-H-381-ULT-450M-P024">
+						<option value="VX-H-381-ULT-450M-P036">
+						<option value="VX-H-381-ULT-450M-P048">
+						<option value="VX-H-381-ULT-450M-P060">
+						<option value="VX-H-381-ULT-450M-Q168">
+						<option value="VX-H-381-ULT-450M-Q280">
+						<option value="VX-H-381-ULT-600M-P036">
+						<option value="VX-H-381-ULT-600M-Q126">
+						<option value="VX-H-381-V80-450M-BX36">
+						<option value="VX-H-381-V80-450M-Q168">
+						<option value="VX-H-406-LGT-450M-BX48">
+						<option value="VX-H-406-LGT-450M-P048">
+						<option value="VX-H-406-LGT-450M-Q224">
+						<option value="VX-H-406-LGT-600M-Q168">
+						<option value="VX-H-406-MED-450M-BX48">
+						<option value="VX-H-406-MED-450M-P048">
+						<option value="VX-H-406-MED-450M-Q224">
+						<option value="VX-H-406-ULT-600M-Q168">
+						<option value="VX-H-438-HVY-450M-BX48">
+						<option value="VX-H-438-HVY-450M-P048">
+						<option value="VX-H-438-HVY-450M-Q224">
+						<option value="VX-H-438-LGT-450M-BX48">
+						<option value="VX-H-438-LGT-450M-BX48">
+						<option value="VX-H-438-LGT-450M-P048">
+						<option value="VX-H-438-LGT-450M-Q224">
+						<option value="VX-H-438-LGT-600M-Q168">
+						<option value="VX-H-438-LGT-600M-Q168">
+						<option value="VX-H-438-MED-450M-BX48">
+						<option value="VX-H-438-MED-450M-Q224">
+						<option value="VX-H-438-MED-600M-Q168">
+						<option value="VX-H-438-ULT-450M-BX48">
+						<option value="VX-H-438-ULT-450M-P048">
+						<option value="VX-H-438-ULT-600M-Q168">
+						<option value="VX-H-438-V80-450M-BX48">
+						<option value="VX-H-438-V80-450M-P048">
+						<option value="VX-H-438-V80-450M-Q224">
+						<option value="VX-H-457-HVY-450M-Q224">
+						<option value="VX-H-457-LGT-450M-BX48">
+						<option value="VX-H-457-LGT-450M-P048">
+						<option value="VX-H-457-LGT-450M-Q224">
+						<option value="VX-H-457-LGT-600M-Q168">
+						<option value="VX-H-457-MED-450M-BX48">
+						<option value="VX-H-457-MED-450M-P048">
+						<option value="VX-H-457-MED-450M-Q224">
+						<option value="VX-H-457-ULT-600M-Q126">
+						<option value="VX-H-457-ULT-600M-Q168">
+						<option value="VX-W-406-HVY-450M-BX48">
+						<option value="VX-W-406-HVY-450M-Q240">
+						<option value="VX-W-406-LGT-450M-BX40">
+						<option value="VX-W-406-LGT-450M-BX48">
+						<option value="VX-W-406-LGT-450M-Q180">
+						<option value="VX-W-406-LGT-450M-Q240">
+						<option value="VX-W-406-LGT-600M-BX40">
+						<option value="VX-W-406-LGT-600M-Q180">
+						<option value="VX-W-406-MED-450M-BX40">
+						<option value="VX-W-406-MED-450M-BX48">
+						<option value="VX-W-406-MED-450M-Q180">
+						<option value="VX-W-406-MED-450M-Q240">
+						<option value="VX-W-406-MED-600M-Q180">
+						<option value="VX-X-381-LGT-450M-P048">
+						<option value="VX-X-381-LGT-600M-X126">
+						<option value="VX-X-381-LGT-600M-X126">
+						<option value="VX-X-381-ULT-600M-X126">
+						<option value="VX-X-438-LGT-450M-X160">
+						<option value="VX-X-438-ULT-600M-X126">
+					</datalist>
+					<input type="text" class="nine columns border w-100 reset" placeholder="ie: VX-H-330-LGT-600M-Q126" value="" list="productList" ng-model="selected"/>					
+				</div>
+				<div class="left-aligned row">
+					<p class="three columns orange-text">Customer ID:</p>
+					<input type="text" class="nine columns border w-100 reset" placeholder="ie: STOCK" value="" ng-model="custid"/>
+				</div>
+				<div class="left-aligned row">
+					<p class="three columns orange-text">PO Number:</p>
+					<input type="text" class="nine columns border w-100 reset" placeholder="" value="" ng-model="po"/>
+				</div>
+				<div class="left-aligned row">
+					<p class="three columns orange-text">No of Skids:</p>
+					<input type="text" class="nine columns border w-100 reset" placeholder="" value="" ng-model="skidQty"/>
+				</div>
+				<div class="left-aligned row">
+					<p class="three columns orange-text">Production QTY:</p>
+					<input type="text" class="five columns border w-100 reset" placeholder="" value="" ng-model="prodQty"/>	
+					<select ng-model="rollOrCase" class="four columns no-border w-100 reset">
+						<option value="">Unit</option>
+						<option value="ROLL">Rolls</option>
+						<option value="CASE">Cases</option>
+					</select>					
+				</div>
+				<div class="row center-aligned margin-top-25">					
+					<button type="button" class="two columns button button-primary printSkidTags" ng-click="printLabel(custid,'',skidQty,prodQty,rollOrCase,po,selected)">Print</button>
+				</div>				
+			</div>
+		</div>
+    </div>        
+  </div>
+</div>
+
+<div id="printSkids" style="display:none;"></div>
+<div id="printLabel" style="display:none;"></div>
+<!-- The Modal -->
+  
+  
+ </div> 
+	
+	<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+	<script src="./js/angular.min.js"></script>	
+	<script src="./js/JsBarcode.all.min.js"></script>
+	<script type="text/javascript" src="./js/custdb.js"></script>
+	<script type="text/javascript" src="./js/fullerApp.js"></script>
+</body>
+</html>
