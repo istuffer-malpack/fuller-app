@@ -45,21 +45,30 @@ body.dark-theme{
 	border:0;
 }
 .text-normal{
-	text-transform: initial;
+	text-transform: capitalize;
     font-size: 16px;
 }
 .white-text{
 	color: #fff;
 }
-
+.lt-green-bg{
+	color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.lt-red-bg{
+	color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
 .content {
   display: none;
   overflow: hidden;
 }
 .sign-out{
-    width: 200px;
+  /*   width: 200px;
     position: relative;
-    right: -73%;
+    right: -73%; */
 }
 .box{
 	height: 160px;
