@@ -57,6 +57,7 @@ app.directive('autoComplete', function($timeout) {
 			$scope.schedule;
 			$scope.linen = machineLines[0];
 			$scope.productId;
+			$scope.user = localStorage.shift;
 			
 			$scope.getOrders = function(){
 				overviewService.getAllOrders().then(
