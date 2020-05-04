@@ -7,11 +7,12 @@
 	<meta name="author" content="Istuffer Sanchez">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noimageindex, noindex, nofollow, nosnippet">
-	
+	<link rel="manifest" href="./manifest.json">
 	<link rel="stylesheet" href="./css/normalize.css">
 	<link rel="stylesheet" href="./css/skeleton.css">
 	<link rel="stylesheet" href="./css/style.css">
-	<link rel="stylesheet" href="./css/circle.css">  
+	<link rel="stylesheet" href="./css/circle.css">
+  
 	<link rel="icon" type="image/png" href="./img/favicon.png">
 </head>
 <body class="dark-theme" ng-app="app" ng-controller="overviewController as view" ng-cloak> 
@@ -512,6 +513,12 @@
   
   
  </div> 
+ <script>
+import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+
+const el = document.createElement('pwa-update');
+document.body.appendChild(el);
+ </script>
 	
 	<script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
 	<script src="./js/angular.min.js"></script>	
