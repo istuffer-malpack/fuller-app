@@ -1,4 +1,4 @@
-if ('serviceWorker' in navigator) { register service worker navigator.serviceWorker.register('/service-worker.js'); }
+if ('serviceWorker' in navigator) { /*register service worker navigator.serviceWorker.register('/service-worker.js');*/ }
 var machineLines = [
 					'PRESTRETCH 1 (38.1)',
 					'PRESTRETCH 2 (43.8)',
