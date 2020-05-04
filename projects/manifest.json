@@ -4,7 +4,7 @@
     "name": "Production | Malpack",
     "scope": "/fuller-app/",
     "display": "standalone",
-    "start_url": "https://istuffer-malpack.github.io/fuller-app/",
+    "start_url": "https://istuffer-malpack.github.io/fuller-app/login.html",
     "short_name": "Production | Ma",
     "theme_color": "transparent",
     "description": "Malpack Production Interface",
