@@ -2,9 +2,9 @@ const staticCacheName = 'site-static-v1';
 const assets = [
   '/',
   '/index.html',
-  '/js/fullerApp.js',
-  '/js/custdb.js',
-  '/css/style.css',
+  './css/*',
+  './js/*',
+  './img/*',
 ];
 // install event
 self.addEventListener('install', evt => {
