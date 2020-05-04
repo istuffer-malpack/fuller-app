@@ -16,7 +16,7 @@
         {
             "src": "/fuller-app/images/fuller-app/img/favicon.png",
             "type": "image/png",
-            "sizes": "32x32"
+            "sizes": "144x144"
         }
     ],
     "url": "https://istuffer-malpack.github.io/fuller-app/",
