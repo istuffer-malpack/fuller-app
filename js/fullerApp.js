@@ -178,21 +178,11 @@ app.directive('autoComplete', function($timeout) {
 		
 						$('#printLabel').printElem('skidLabel',0,0,localStorage.shift,""); 	
 							
-					},800);
-				
-			
+					},800);			
 			};
 			
-			//autocomplete
-			
-			$scope.datalist = productList;
-			
-			
-			
-			
-			
-			
-			
+			//autocomplete			
+			$scope.datalist = productList;					
 	  };
 	  init();
 	}	
@@ -205,7 +195,8 @@ function printBarcode(skidnumber,prodid,qty){
 	var skidIDs = new Array();
 		skidIDs = (skidnumber.split(',')).filter((v, i, a) => a.indexOf(v) === i);
 		
-		for(var i=0;i<qty;i++){					
+	var totalSkids = (skidIDs.length > qty) ? skidIDs.length : qty;	
+		for(var i=0;i<totalSkids;i++){					
 						
 			htmlContent = '<div class="bc-div" style="width: 100%;display:block;">'+
 							'<p class="bcodelabel" style="width:100%;">'+
@@ -215,7 +206,7 @@ function printBarcode(skidnumber,prodid,qty){
 							'<img class="barcode'+skidIDs[i]+' barcode" style="display:block;margin:0 auto;width:110%;position:relative;top:-8px;"/>'+
 							'<p style="width:100%;text-align:center;margin: 10px 0 0 50px;color: #000;font-size: 32px;line-height: 1.25rem;font-family: arial;font-weight: 400;">MADE IN CANADA</p>'+
 							'<p style="width:100%;text-align:right;margin-top:230px;color: #000;font-size:40px;font-family: arial;font-weight:700;margin-bottom:0;">'+
-								(i + 1)+' of '+ qty +'</p>'+
+								(i + 1)+' of '+ totalSkids +'</p>'+
 							'</div>';				  
 								
 							
