@@ -251,7 +251,7 @@ jQuery.fn.extend({
     style = document.createElement('style');
 	 
 	 if(a == 'skidTags'){ 
-		css = '@page { size: 11in 8.5in; margin-top: 5.5cm;}body{width:920px;height: 610px;}';
+		css = '@page { size: 11in 8.5in; margin-top: 5.5cm;}body{width:920px;height: 620px;}';
 	 }else if(a == 'skidLabel'){
 		 css = '@page { size: 11in 8.5in;margin:10mm 15mm;}body{width:980px;height: auto;color:#000;font-family:"Times New Roman"!important;}'+
 				'.container *{margin:0;padding:0;}.container{width:100%;font-weight:600;text-align:center;padding:15px 0 0;margin:0;page-break-inside:avoid;}'+
