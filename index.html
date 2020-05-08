@@ -305,13 +305,27 @@
       <h4 class="info-text">Print Skid Tag</h4>
     </div>
    
-    <div class="modal-body section align-center" id="skidtag" style="text-align:center;">		
+    <div class="modal-body section" id="skidtag">		
 		<div class="form-inline section">					
 			<div class="form-group bc-form">
 				<!-- <span class="row ">Barcode:</span> -->
-				<input type="text" class="skidIdFrom border w-40" placeholder="Barcode from" value="" ng-model="skididfrom"/>
+				<!-- <input type="text" class="skidIdFrom border w-40" placeholder="Barcode from" value="" ng-model="skididfrom"/>
 				<input type="text" class="skidIdTo border w-40" placeholder="Barcode to" value="" ng-model="skididto"/>
-				<button type="button" class="button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skididfrom,skididto,productId)">Print</button>
+				<button type="button" class="button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skididfrom,skididto,productId)">Print</button> -->
+				<div class="row">
+					<p class="three columns orange-text">Barcode IDs:</p>
+					<textarea class="nine columns reset" style="min-height:160px;border:1px #d4d4d4 solid!important;" ng-model="skidnumbers1"></textarea>
+				</div>
+				<div class="row">
+					<p class="nine columns u-pull-right">Enter multiple/skipping Barcode IDs with a dash <b class="red-text">(-)</b> and/or semicolon <b class="red-text">(;)</b>.
+						<span class="stacked"><b style="color:teal;font-weight: bold;">0000001-0000008;0000011;0000022-0000025</b></span>
+					</p>					
+				</div>
+				<div class="margin-bottom-15 right-aligned">
+					<!-- <input type="text" class="five columns skidIdFrom border w-100 reset" placeholder="Barcode from" value="" ng-model="skidfrom"/>
+					<input type="text" class="five columns skidIdTo border w-100 reset" placeholder="Barcode to" value="" ng-model="skidto"/> -->
+					<button type="button" class="w-30 button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skidnumbers1,productId)">Print</button>
+				</div>		
 			</div>
 		</div>
     </div>        
@@ -326,17 +340,27 @@
       <h4 class="info-text">Print Barcode</h4>
     </div>
    
-    <div class="modal-body section align-center" id="skidtag">		
+    <div class="modal-body section" id="skidtag">		
 		<div class="form-inline section">					
 			<div class="form-group bc-form">
 				<div class="left-aligned row">
 					<p class="three columns orange-text">Product Code:</p>
-					<input type="text" class="nine columns border w-100 prodid reset" placeholder="ie: VX-H-330-LGT-600M-Q126" value="" ng-model="prodC"/>
+					<input type="text" class="nine columns border w-100 prodid reset" placeholder="ie: VX-H-330-LGT-600M-Q126" value="{{productId}}" ng-model="prodC"/>
 				</div>
 				<div class="row">
-					<input type="text" class="five columns skidIdFrom border w-100 reset" placeholder="Barcode from" value="" ng-model="skidfrom"/>
-					<input type="text" class="five columns skidIdTo border w-100 reset" placeholder="Barcode to" value="" ng-model="skidto"/>
-					<button type="button" class="two columns button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skidfrom,skidto,prodC)">Print</button>
+					<p class="three columns orange-text">Barcode IDs:</p>
+					<textarea class="nine columns reset" style="min-height:160px;border:1px #d4d4d4 solid!important;" ng-model="skidnumbers"></textarea>
+					
+				</div>
+				<div class="row">
+					<p class="nine columns u-pull-right">Enter multiple/skipping Barcode IDs with a dash <b class="red-text">(-)</b> and/or semicolon <b class="red-text">(;)</b>.
+						<span class="stacked"><b style="color:teal;font-weight: bold;">0000001-0000008;0000011;0000022-0000025</b></span>
+					</p>					
+				</div>
+				<div class="margin-bottom-15 right-aligned">
+					<!-- <input type="text" class="five columns skidIdFrom border w-100 reset" placeholder="Barcode from" value="" ng-model="skidfrom"/>
+					<input type="text" class="five columns skidIdTo border w-100 reset" placeholder="Barcode to" value="" ng-model="skidto"/> -->
+					<button type="button" class="w-30 button button-primary printSkidTags" ng-click="printBarcodeOverwrite(skidnumbers,prodC)">Print</button>
 				</div>				
 			</div>
 		</div>
