@@ -342,7 +342,7 @@ function showModal(ele){
 		var modal = document.getElementById(ele);
 		modal.style.display = "none";
 		$('.reset').val('');
-		
+		$('textarea').val('');
 		
 	}
 	
